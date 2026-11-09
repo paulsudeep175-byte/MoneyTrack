@@ -14,10 +14,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -28,9 +24,19 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install Android SDK packages
+      - name: Locate and install Android SDK packages
+        shell: bash
         run: |
-          SDKMANAGER="$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+
+          if [ -z "$SDKMANAGER" ]; then
+            echo "ERROR: Android SDK Manager not found"
+            find "$ANDROID_HOME" -maxdepth 5 -type f -name sdkmanager
+            exit 1
+          fi
+
+          echo "Using SDK Manager: $SDKMANAGER"
           yes | "$SDKMANAGER" --licenses || true
           "$SDKMANAGER" --install "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
