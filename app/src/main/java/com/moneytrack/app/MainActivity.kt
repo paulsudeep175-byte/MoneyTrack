@@ -80,7 +80,8 @@ class MainActivity : Activity() {
 
         search = EditText(this).apply {
             hint = if (showPeople) "Search person or UPI ID" else "Search transactions"
-            singleLine = true; setPadding(dp(12), dp(8), dp(12), dp(8))
+           setSingleLine(true)
+            setPadding(dp(12), dp(8), dp(12), dp(8))
         }
         content.addView(search)
         listBox = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
